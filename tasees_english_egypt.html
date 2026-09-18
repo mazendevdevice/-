@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تأسيس الإنجليزي المصري 🇪🇬</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Tahoma, Arial, sans-serif; }
+  body { background: linear-gradient(135deg,#0f2027,#203a43,#2c5364); min-height:100vh; color:#fff; }
+
+  /* ===== شاشة الباسورد ===== */
+  #lockScreen { position:fixed; inset:0; background:#0f2027; display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:100; transition:opacity .6s; }
+  #lockScreen.hidden { opacity:0; pointer-events:none; }
+  .lock-box { background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); border-radius:20px; padding:40px; text-align:center; width:320px; box-shadow:0 10px 40px rgba(0,0,0,.5); }
+  .lock-box h1 { font-size:1.4rem; margin-bottom:8px; }
+  .lock-box p { color:#9fd3c7; margin-bottom:20px; font-size:.9rem; }
+  .lock-box input { width:100%; padding:12px; border-radius:10px; border:none; text-align:center; font-size:1.3rem; letter-spacing:8px; outline:none; }
+  .lock-box button { margin-top:15px; width:100%; padding:12px; border:none; border-radius:10px; background:#27ae60; color:#fff; font-size:1.1rem; cursor:pointer; font-weight:bold; transition:.3s; }
+  .lock-box button:hover { background:#2ecc71; transform:translateY(-2px); }
+  #errMsg { color:#e74c3c; margin-top:10px; font-size:.85rem; display:none; }
+
+  /* ===== الموقع ===== */
+  header { text-align:center; padding:35px 15px 20px; }
+  header h1 { font-size:2.2rem; text-shadow:0 3px 10px rgba(0,0,0,.4); }
+  header p { color:#9fd3c7; margin-top:8px; }
+  .flag { font-size:2.5rem; }
+
+  nav { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; padding:15px; position:sticky; top:0; background:rgba(15,32,39,.92); z-index:50; backdrop-filter:blur(8px); }
+  nav button { background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.2); color:#fff; padding:9px 18px; border-radius:25px; cursor:pointer; transition:.25s; font-size:.92rem; }
+  nav button:hover, nav button.active { background:#27ae60; border-color:#27ae60; }
+
+  section { max-width:900px; margin:25px auto; padding:0 15px; display:none; animation:fadeIn .5s; }
+  section.visible { display:block; }
+  @keyframes fadeIn { from{opacity:0; transform:translateY(15px);} to{opacity:1; transform:none;} }
+  .card { background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.12); border-radius:16px; padding:22px; margin-bottom:18px; }
+  .card h2 { color:#2ecc71; margin-bottom:12px; font-size:1.3rem; }
+  .card h3 { color:#f1c40f; margin:14px 0 8px; }
+  .card ul { padding-right:22px; line-height:2; }
+  .card p { line-height:1.9; margin-bottom:8px; }
+
+  table { width:100%; border-collapse:collapse; margin-top:10px; }
+  th, td { padding:10px; border:1px solid rgba(255,255,255,.15); text-align:center; }
+  th { background:rgba(46,204,113,.25); }
+  td { background:rgba(255,255,255,.05); }
+  .en { direction:ltr; font-weight:bold; color:#f1c40f; font-size:1.05rem; }
+
+  .steps { counter-reset:step; }
+  .step { background:rgba(255,255,255,.06); border-radius:12px; padding:15px 18px 15px 15px; margin-bottom:12px; position:relative; border-right:4px solid #2ecc71; }
+  .step b { color:#f1c40f; }
+
+  .letters { display:grid; grid-template-columns:repeat(auto-fill,minmax(70px,1fr)); gap:8px; margin-top:10px; }
+  .letter { background:rgba(255,255,255,.08); border-radius:10px; padding:10px; text-align:center; cursor:pointer; transition:.2s; }
+  .letter:hover { background:#27ae60; transform:scale(1.08); }
+  .letter .en { display:block; font-size:1.4rem; }
+  .letter small { color:#9fd3c7; }
+
+  .quiz-q { margin-bottom:15px; }
+  .quiz-q b { color:#f1c40f; }
+  .quiz-q label { display:block; background:rgba(255,255,255,.06); padding:8px 12px; border-radius:8px; margin:6px 0; cursor:pointer; transition:.2s; }
+  .quiz-q label:hover { background:rgba(46,204,113,.3); }
+  .quiz-q input { margin-left:8px; }
+  #quizResult { font-size:1.2rem; font-weight:bold; margin-top:15px; }
+  .main-btn { background:#27ae60; border:none; color:#fff; padding:12px 30px; border-radius:25px; font-size:1.05rem; cursor:pointer; font-weight:bold; transition:.3s; }
+  .main-btn:hover { background:#2ecc71; transform:translateY(-2px); }
+
+  footer { text-align:center; padding:25px; color:#9fd3c7; font-size:.85rem; }
+</style>
+</head>
+<body>
+
+<!-- ======== شاشة كلمة السر ======== -->
+<div id="lockScreen">
+  <div class="lock-box">
+    <div style="font-size:3rem;">🔒</div>
+    <h1>تأسيس الإنجليزي المصري</h1>
+    <p>الموقع محمي.. ادخل كلمة السر يا بطل 🇪🇬</p>
+    <input type="password" id="pwd" placeholder="••••" maxlength="10" autocomplete="off">
+    <button onclick="checkPwd()">ادخل 🔓</button>
+    <div id="errMsg">❌ كلمة السر غلط.. حاول تاني!</div>
+  </div>
+</div>
+
+<header>
+  <div class="flag">🇪🇬📚</div>
+  <h1>تأسيس اللغة الإنجليزية</h1>
+  <p>من الصفر للاحتراف.. بالطريقة المصرية السهلة 🇪🇬</p>
+</header>
+
+<nav>
+  <button onclick="showSection('roadmap',this)" class="active">🗺️ خطة التأسيس</button>
+  <button onclick="showSection('alphabet',this)">🔤 الحروف والأصوات</button>
+  <button onclick="showSection('vocab',this)">📝 كلمات أساسية</button>
+  <button onclick="showSection('grammar',this)">⚙️ قواعد مبسطة</button>
+  <button onclick="showSection('phrases',this)">💬 جمل ومحادثات</button>
+  <button onclick="showSection('quiz',this)">🎯 اختبر نفسك</button>
+</nav>
+
+<!-- ======== خطة التأسيس ======== -->
+<section id="roadmap" class="visible">
+  <div class="card">
+    <h2>🗺️ خطة تأسيس الإنجليزي خطوة بخطوة</h2>
+    <div class="steps">
+      <div class="step"><b>الخطوة 1:</b> الحروف الأبجدية (Alphabet) — نطق كل حرف صح وتمييز شكله الكبير والصغير.</div>
+      <div class="step"><b>الخطوة 2:</b> أصوات الحروف (Phonics/Sounds) — كل حرف ليه صوت، زي A بيتنطق "إيه".</div>
+      <div class="step"><b>الخطوة 3:</b> كلمات سهلة — ألوان، أرقام، أسماء حيوانات وأسماء اليوم.</div>
+      <div class="step"><b>الخطوة 4:</b> التحيات والتعارف (Greetings) — أول محادثة إنجليزي كاملة.</div>
+      <div class="step"><b>الخطوة 5:</b> الجمل البسيطة — ضمائر + فعل + حاجة (I like tea ☕).</div>
+      <div class="step"><b>الخطوة 6:</b> القواعد الأساسية — الجمع (s) والنفي (don't) والسؤال (Do you..?).</div>
+      <div class="step"><b>الخطوة 7:</b> التدريب اليومي — كلمات جديدة كل يوم + سماع + تكرار بصوت عالي.</div>
+    </div>
+    <h3>💡 نصايح ذهبية:</h3>
+    <ul>
+      <li>كرر بصوت عالي.. الإنجليزي بيتعلم بالسمع والنطق مش بالكتب بس.</li>
+      <li>اتفرج على فيديوهات كرتون إنجليزي بسيطة يومياً.</li>
+      <li>اكتب كل كلمة جديدة 3 مرات بالإيد عشان تثبت.</li>
+      <li>خصص 20 دقيقة يومياً واستمر.. الاستمرارية أهم من المذاكرة الكتير مرة واحدة.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ======== الحروف ======== -->
+<section id="alphabet">
+  <div class="card">
+    <h2>🔤 الحروف والأصوات</h2>
+    <p>دوس على أي حرف تسمع اسمه وصوته! 🎧</p>
+    <div class="letters" id="lettersGrid"></div>
+    <h3>أمثلة على أصوات الحروف:</h3>
+    <table>
+      <tr><th>الحرف</th><th>صوته</th><th>مثال</th></tr>
+      <tr><td class="en">A</td><td>إيه</td><td class="en">Apple 🍎</td></tr>
+      <tr><td class="en">B</td><td>بي</td><td class="en">Ball ⚽</td></tr>
+      <tr><td class="en">C</td><td>سي</td><td class="en">Cat 🐱</td></tr>
+      <tr><td class="en">M</td><td>إم</td><td class="en">Milk 🥛</td></tr>
+      <tr><td class="en">S</td><td>إس</td><td class="en">Sun ☀️</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ======== كلمات ======== -->
+<section id="vocab">
+  <div class="card">
+    <h2>📝 أهم الكلمات الأساسية</h2>
+    <h3>🎨 الألوان</h3>
+    <table>
+      <tr><th>الإنجليزي</th><th>المعنى</th></tr>
+      <tr><td class="en">Red</td><td>أحمر</td></tr>
+      <tr><td class="en">Blue</td><td>أزرق</td></tr>
+      <tr><td class="en">Green</td><td>أخضر</td></tr>
+      <tr><td class="en">Yellow</td><td>أصفر</td></tr>
+      <tr><td class="en">Black</td><td>أسود</td></tr>
+      <tr><td class="en">White</td><td>أبيض</td></tr>
+    </table>
+    <h3>🔢 الأرقام</h3>
+    <table>
+      <tr><th>الرقم</th><th>الإنجليزي</th><th>النطق تقريباً</th></tr>
+      <tr><td>1</td><td class="en">One</td><td>وان</td></tr>
+      <tr><td>2</td><td class="en">Two</td><td>تو</td></tr>
+      <tr><td>3</td><td class="en">Three</td><td>ثري</td></tr>
+      <tr><td>4</td><td class="en">Four</td><td>فور</td></tr>
+      <tr><td>5</td><td class="en">Five</td><td>فايف</td></tr>
+      <tr><td>10</td><td class="en">Ten</td><td>تين</td></tr>
+    </table>
+    <h3>📅 أيام الأسبوع</h3>
+    <table>
+      <tr><th>اليوم</th><th>الإنجليزي</th></tr>
+      <tr><td>السبت</td><td class="en">Saturday</td></tr>
+      <tr><td>الأحد</td><td class="en">Sunday</td></tr>
+      <tr><td>الاثنين</td><td class="en">Monday</td></tr>
+      <tr><td>الجمعة</td><td class="en">Friday</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ======== قواعد ======== -->
+<section id="grammar">
+  <div class="card">
+    <h2>⚙️ قواعد مبسطة للمبتدئين</h2>
+    <h3>1️⃣ الضمائر</h3>
+    <ul>
+      <li class="en">I = أنا &nbsp;•&nbsp; You = أنتَ/أنتِ &nbsp;•&nbsp; He = هو &nbsp;•&nbsp; She = هي</li>
+      <li class="en">We = نحن &nbsp;•&nbsp; They = هم</li>
+    </ul>
+    <h3>2️⃣ جملة بسيطة (فاعل + فعل)</h3>
+    <ul>
+      <li class="en">I like tea. ☕ (بحب الشاي)</li>
+      <li class="en">She likes music. 🎵 (هي بتحب الموسيقى)</li>
+      <li class="en">We play football. ⚽ (بنلعب كورة)</li>
+    </ul>
+    <h3>3️⃣ النفي بـ Don't / Doesn't</h3>
+    <ul>
+      <li class="en">I don't understand. (مش فاهم)</li>
+      <li class="en">He doesn't like fish. (هو مش بيحب السمك)</li>
+    </ul>
+    <h3>4️⃣ السؤال بـ Do / Does</h3>
+    <ul>
+      <li class="en">Do you speak English? (بتتكلم إنجليزي؟)</li>
+      <li class="en">Does she work here? (هي بتشتغل هنا؟)</li>
+    </ul>
+    <p style="margin-top:10px;color:#9fd3c7;">💡 القاعدة الذهبية: مع He و She نستخدم Does و Doesn't والفعل يرجع لصورته الأصلية.</p>
+  </div>
+</section>
+
+<!-- ======== محادثات ======== -->
+<section id="phrases">
+  <div class="card">
+    <h2>💬 جمل ومحادثات جاهزة</h2>
+    <h3>👋 التحيات</h3>
+    <ul>
+      <li class="en">Hello! / Hi! = أهلاً!</li>
+      <li class="en">Good morning = صباح الخير</li>
+      <li class="en">How are you? = إزيك؟</li>
+      <li class="en">I'm fine, thank you = أنا كويس، شكراً</li>
+      <li class="en">Goodbye = مع السلامة</li>
+    </ul>
+    <h3>🗣️ محادثة تعارف كاملة</h3>
+    <ul>
+      <li class="en">A: What's your name? (اسمك إيه؟)</li>
+      <li class="en">B: My name is Ahmed. (اسمي أحمد)</li>
+      <li class="en">A: Where are you from? (منين؟)</li>
+      <li class="en">B: I'm from Egypt. 🇪🇬 (من مصر)</li>
+      <li class="en">A: Nice to meet you! (تشرفنا!)</li>
+      <li class="en">B: Nice to meet you too! (وأنا كمان!)</li>
+    </ul>
+    <h3>❓ أسئلة مهمة</h3>
+    <ul>
+      <li class="en">What is this? = ده إيه؟</li>
+      <li class="en">How much? = بكام؟</li>
+      <li class="en">Where is the bathroom? = فين الحمام؟</li>
+      <li class="en">Can you help me? = تقدر تساعدني؟</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ======== الاختبار ======== -->
+<section id="quiz">
+  <div class="card">
+    <h2>🎯 اختبر نفسك</h2>
+    <div id="quizBox"></div>
+    <button class="main-btn" onclick="checkQuiz()">شوف النتيجة ✅</button>
+    <div id="quizResult"></div>
+  </div>
+</section>
+
+<footer>صنع بحب في مصر 🇪🇬 • استمر في التدريب كل يوم و هتبقى محترف! 💪</footer>
+
+<script>
+// ===== كلمة السر =====
+function checkPwd(){
+  var p = document.getElementById('pwd').value;
+  if(p === '6711'){
+    document.getElementById('lockScreen').classList.add('hidden');
+  } else {
+    var e = document.getElementById('errMsg');
+    e.style.display = 'block';
+    setTimeout(function(){ e.style.display='none'; }, 2000);
+  }
+}
+document.getElementById('pwd').addEventListener('keydown', function(ev){
+  if(ev.key === 'Enter') checkPwd();
+});
+
+// ===== التنقل =====
+function showSection(id, btn){
+  document.querySelectorAll('section').forEach(function(s){ s.classList.remove('visible'); });
+  document.querySelectorAll('nav button').forEach(function(b){ b.classList.remove('active'); });
+  document.getElementById(id).classList.add('visible');
+  btn.classList.add('active');
+}
+
+// ===== الحروف مع النطق =====
+var letters = [
+  ['A','إيه'],['B','بي'],['C','سي'],['D','دي'],['E','إي'],['F','إف'],['G','جي'],['H','إتش'],
+  ['I','آي'],['J','جاي'],['K','كيه'],['L','إل'],['M','إم'],['N','إن'],['O','أو'],['P','بي'],
+  ['Q','كيو'],['R','آر'],['S','إس'],['T','تي'],['U','يو'],['V','في'],['W','دبليو'],['X','إكس'],
+  ['Y','واي'],['Z','زي']
+];
+var grid = document.getElementById('lettersGrid');
+letters.forEach(function(l){
+  var d = document.createElement('div');
+  d.className = 'letter';
+  d.innerHTML = '<span class="en">' + l[0] + '</span><small>' + l[1] + '</small>';
+  d.onclick = function(){
+    try {
+      var u = new SpeechSynthesisUtterance(l[0]);
+      u.lang = 'en-US'; speechSynthesis.speak(u);
+    } catch(e){}
+  };
+  grid.appendChild(d);
+});
+
+// ===== الاختبار =====
+var quizData = [
+  { q:'1. يعني إيه كلمة "Red"؟', a:['أزرق','أحمر','أخضر'], c:1 },
+  { q:'2. إيه جمع كلمة "Cat"؟', a:['Cats','Caties','Catess'], c:0 },
+  { q:'3. "أنا بحب الشاي" بالإنجليزي:', a:['I likes tea','I like tea','I liking tea'], c:1 },
+  { q:'4. يعني إيه "Good morning"؟', a:['مساء الخير','تصبح على خير','صباح الخير'], c:2 },
+  { q:'5. "She ___ from Egypt."', a:['am','is','are'], c:1 },
+  { q:'6. النفي الصح: "He ___ like fish."', a:["don't","doesn't","isn't"], c:1 }
+];
+var qb = document.getElementById('quizBox');
+quizData.forEach(function(item, qi){
+  var div = document.createElement('div');
+  div.className = 'quiz-q';
+  div.innerHTML = '<b>' + item.q + '</b>';
+  item.a.forEach(function(opt, ai){
+    div.innerHTML += '<label><input type="radio" name="q' + qi + '" value="' + ai + '"> <span class="en">' + opt + '</span></label>';
+  });
+  qb.appendChild(div);
+});
+
+function checkQuiz(){
+  var score = 0;
+  quizData.forEach(function(item, qi){
+    var sel = document.querySelector('input[name="q' + qi + '"]:checked');
+    if(sel && parseInt(sel.value) === item.c) score++;
+  });
+  var res = document.getElementById('quizResult');
+  var msg = score >= 5 ? '🔥 ممتاز! إنت جاهز للمستوى اللي بعده' :
+            score >= 3 ? '👍 كويس! راجع الغلطات وهتبقى تمام' :
+            '💪 متقلقش.. ارجع للخطوات وركز في الحروف والكلمات';
+  res.style.color = score >= 3 ? '#2ecc71' : '#f1c40f';
+  res.textContent = 'نتيجتك: ' + score + ' من ' + quizData.length + ' — ' + msg;
+}
+</script>
+</body>
+</html>
